@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/akshaykmanoj/csharp-project.git'
+            }
+        }
+        
+        stage('Restore Dependencies') {
+            steps {
+                sh 'dotnet restore'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'dotnet build'
+            }
+        }
+        
+        stage('Unit Test') {
+            steps {
+                sh 'dotnet test'
+            }
+        }
+        
+        stage('Code Analysis') {
+            steps {
+                sh 'dotnet sonarscanner begin /k:"your-project-key" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="your-sonarcloud-token"'
+                sh 'dotnet build'
+                sh 'dotnet sonarscanner end /d:sonar.login="your-sonarcloud-token"'
+            }
+        }
+    }
+}
